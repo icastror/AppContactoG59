@@ -15,11 +15,15 @@ public class HomeController : Controller
         _contexto = contexto;
     }
 
+    ///  Consultar todos los registros  ////
+
     [HttpGet]
     public async Task<IActionResult> Index() // 6 Instruccion
     {
         return View(await _contexto.Contacto.ToListAsync());
     }   
+
+    ///  Crear un registro  ////
 
     public IActionResult Crear() // 7 Instruccion
     {
@@ -32,13 +36,107 @@ public class HomeController : Controller
     {
         if (ModelState.IsValid)
         {
-            _contexto.Contacto.Add(contacto);
+            _contexto.Contacto.Add(contacto); // Insert
             await _contexto.SaveChangesAsync();
             return RedirectToAction(nameof(Index));
         }
         return View();
     }
 
+    ///  Editar  ////
+
+    [HttpGet]
+    public IActionResult Editar(int? id)
+    {
+        if(id == null)
+        {
+            return NotFound();
+        }
+        
+        // SELECT * FROM contacto WHERE id = 2
+        var contacto = _contexto.Contacto.Find(id);
+
+        if(contacto == null)
+        {
+            return NotFound();
+        }
+
+        return View(contacto);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Editar(Contacto contacto) //
+    {
+        if (ModelState.IsValid)
+        {
+            _contexto.Contacto.Update(contacto); // Update
+            await _contexto.SaveChangesAsync();
+            return RedirectToAction(nameof(Index));
+        }
+        
+        return View();
+    }
+    
+    ///  Detalle  ////
+
+    [HttpGet] 
+    public IActionResult Detalle(int? id)
+    {
+        if(id == null)
+        {
+            return NotFound();
+        }
+        
+        // SELECT * FROM contacto WHERE id = 2
+        var contacto = _contexto.Contacto.Find(id);
+
+        if(contacto == null)
+        {
+            return NotFound();
+        }
+
+        return View(contacto);
+    }
+
+    ///  Borrar  ////
+
+    [HttpGet]
+    public IActionResult Borrar(int? id)
+    {
+        if(id == null)
+        {
+            return NotFound();
+        }
+        
+        // SELECT * FROM contacto WHERE id = 2
+        var contacto = _contexto.Contacto.Find(id);
+
+        if(contacto == null)
+        {
+            return NotFound();
+        }
+
+        return View(contacto);
+    }
+
+    [HttpPost, ActionName("Borrar")]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> BorrarContacto(int? id)
+    {
+        
+        var contacto = await _contexto.Contacto.FindAsync(id);
+        
+        if (contacto == null)
+        {
+            return View();
+        }
+
+        _contexto.Contacto.Remove(contacto); // Delete
+        await _contexto.SaveChangesAsync();
+        
+        return RedirectToAction(nameof(Index));
+    }
 
     ///  ----  ////
 
